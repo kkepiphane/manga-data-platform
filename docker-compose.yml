@@ -1,0 +1,40 @@
+# version: "3.9"
+
+services:
+
+  scraper:
+    build:
+      context: .
+      dockerfile: ingestion/Dockerfile
+    container_name: manga_scraper
+    volumes:  
+    - .:/app
+    working_dir: /app/ingestion 
+    command: tail -f /dev/null
+    networks:
+      - manga-network
+
+# ==============================================
+# SERVICE : POSTGRESQL 
+# ==============================================
+  postgres:
+    image: postgres:15
+    container_name: manga_postgres
+    environment:
+      POSTGRES_USER: manga
+      POSTGRES_PASSWORD: manga12
+      POSTGRES_DB: manga_db
+    ports:
+      - "5432:5432"
+    networks:
+      - manga-network
+    # logging: *default-logging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U manga -d manga_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  manga-network:
