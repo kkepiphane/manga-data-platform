@@ -54,7 +54,8 @@ Frontend / Dashboard
 manga-data-platform/
 
 ingestion/
-   scrapy_project/
+   manga_scraper/
+   data/
 
 streaming/
    kafka_producer.py
