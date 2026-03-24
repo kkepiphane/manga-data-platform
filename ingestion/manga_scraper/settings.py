@@ -1,5 +1,5 @@
 ITEM_PIPELINES = {
-   'manga_scraper.pipelines.json_pipeline.JsonPipeline': 300,
+   'manga_scraper.pipelines.json_pipeline.KafkaPipeline': 300,
 }
 
 ROBOTSTXT_OBEY = True
