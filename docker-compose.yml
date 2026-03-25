@@ -8,7 +8,7 @@ services:
       dockerfile: ingestion/Dockerfile
     container_name: manga_scraper
     volumes:  
-    - .:/app
+      - .:/app
     working_dir: /app/ingestion 
     command: tail -f /dev/null
     networks:
@@ -59,30 +59,37 @@ services:
       - manga-network
 
   spark-master:
-    image: bitnami/spark:3.5.0
+    build:
+      context: ./processing
+      dockerfile: Dockerfile
     container_name: manga_spark_master
     environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_MASTER_HOST=spark-master
+      # - SPARK_MASTER_PORT=7077
+      - NAMENODE_HOST=namenode
+      - SPARK_ROLE=master
     ports:
       - "8080:8080" # Interface Web pour voir tes jobs
       - "7077:7077"
     volumes:
-      - .:/app
+      - ./data_lake:/opt/spark/data_lake
     networks:
       - manga-network
 
   spark-worker:
-    image: bitnami/spark:3.5.0
+    build:
+      context: ./processing
+      dockerfile: Dockerfile
     container_name: manga_spark_worker
     environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_ROLE=worker
+      - SPARK_MASTER_HOST=spark-master
     depends_on:
       - spark-master
+    ports:
+      - "8081:8081"
     volumes:
-      - .:/app
+      - ./data_lake:/opt/spark/data_lake
     networks:
       - manga-network
 

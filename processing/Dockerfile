@@ -22,4 +22,4 @@ RUN chmod +x /entrypoint.sh
 
 EXPOSE 4040 7077 8080 8081
 
-# ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

@@ -3,6 +3,7 @@ import os
 import psycopg2
 from kafka import KafkaConsumer
 from datetime import datetime
+from psycopg2.extras import execute_batch
 
 # Configuration
 KAFKA_SERVER = 'kafka:9092'
@@ -33,12 +34,14 @@ def insert_to_postgres(items):
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         cur = conn.cursor()
-        for item in items:
-            # Exemple simple : adapte selon tes colonnes Scrapy
-            cur.execute(
-                "INSERT INTO mangas (title, url, created_at) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING",
-                (item.get('title'), item.get('url'), datetime.now())
-            )
+        execute_batch(cur, """
+          INSERT INTO mangas (title, url, created_at)
+          VALUES (%s, %s, %s)
+          ON CONFLICT DO NOTHING
+          """, [
+            (item.get('title'), item.get('url'), datetime.now())
+            for item in items
+        ])
         conn.commit()
         cur.close()
         conn.close()
@@ -61,11 +64,11 @@ print("--- Consumer démarré. En attente de données...")
 batch = []
 BATCH_SIZE = 10  # On attend d'avoir 10 items avant d'écrire sur disque/DB
 
-for message in consumer:
-    item = message.value
-    batch.append(item)
+# for message in consumer:
+#     item = message.value
+#     batch.append(item)
 
-    if len(batch) >= BATCH_SIZE:
-        archive_to_datalake(batch)
-        insert_to_postgres(batch)
-        batch = []  # On vide le tampon
+#     if len(batch) >= BATCH_SIZE:
+#         archive_to_datalake(batch)
+#         insert_to_postgres(batch)
+#         batch = []  # On vide le tampon

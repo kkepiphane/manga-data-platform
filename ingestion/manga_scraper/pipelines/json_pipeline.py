@@ -6,7 +6,7 @@ class KafkaPipeline:
     def open_spider(self, spider):
         # On se connecte à Kafka au lieu d'ouvrir un fichier
         self.producer = KafkaProducer(
-            bootstrap_servers=['localhost:9092'],
+            bootstrap_servers=['kafka:9092'],
             value_serializer=lambda v: json.dumps(
                 v, ensure_ascii=False).encode('utf-8')
         )
@@ -14,7 +14,7 @@ class KafkaPipeline:
     def process_item(self, item, spider):
         # On envoie l'item dans le "tuyau" Kafka
         # C'est ultra rapide car c'est envoyé en mémoire
-        self.producer.send('manga_raw_topic', dict(item))
+        self.producer.send('manga_raw', dict(item))
         return item
 
     def close_spider(self, spider):
