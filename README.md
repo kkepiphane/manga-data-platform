@@ -22,28 +22,24 @@ L'objectif est de construire un système capable d'aider les utilisateurs à dé
 Le système suit une architecture orientée **Data Pipeline**.
 
 ```
-Websites
-   │
-   ▼
-Scrapy (Data Ingestion)
-   │
-   ▼
-Kafka (Streaming)
-   │
-   ▼
-Spark (Data Processing)
-   │
-   ▼
-PostgreSQL (Data Warehouse)
-   │
-   ▼
-Machine Learning (MLflow)
-   │
-   ▼
-API (FastAPI)
-   │
-   ▼
-Frontend / Dashboard
+Scrapy
+   ↓
+Kafka
+   ↓
+Spark Streaming
+   ↓
+───────────────
+↓             ↓
+Data Lake     PostgreSQL
+(JSON/Parquet) (API)
+   ↓
+Feature Engineering
+   ↓
+MLflow
+   ↓
+FastAPI
+   ↓
+Dashboard
 ```
 
 ---
@@ -66,8 +62,8 @@ data_lake/
    processed/
 
 processing/
-   spark_jobs/
-      clean_data.py
+   jobs/ #spark
+      streaming_job.py
       transform_data.py
 
 warehouse/

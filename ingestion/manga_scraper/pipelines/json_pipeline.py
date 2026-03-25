@@ -1,19 +1,22 @@
 import json
-from datetime import datetime
+from kafka import KafkaProducer
 
-class JsonPipeline:
+
+class KafkaPipeline:
     def open_spider(self, spider):
-        # Créer un fichier avec la date et l'heure
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.filename = f"data/raw_mangs_{timestamp}.json"
-        self.file = open(self.filename, "w", encoding='utf-8')
-        print(f"Sauvegarde dans : {self.filename}")
-    
-    def close_spider(self, spider):
-        self.file.close()
-        print(f"Fichier sauvegardé : {self.filename}")
-    
+        # On se connecte à Kafka au lieu d'ouvrir un fichier
+        self.producer = KafkaProducer(
+            bootstrap_servers=['kafka:9092'],
+            value_serializer=lambda v: json.dumps(
+                v, ensure_ascii=False).encode('utf-8')
+        )
+
     def process_item(self, item, spider):
-        line = json.dumps(dict(item), ensure_ascii=False) + "\n"
-        self.file.write(line)
+        # On envoie l'item dans le "tuyau" Kafka
+        # C'est ultra rapide car c'est envoyé en mémoire
+        self.producer.send('manga_raw', dict(item))
         return item
+
+    def close_spider(self, spider):
+        self.producer.flush()  # On s'assure que tout est envoyé avant de fermer
+        self.producer.close()
