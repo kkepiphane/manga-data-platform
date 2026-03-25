@@ -15,6 +15,7 @@ COPY postgresql-42.6.2.jar /opt/spark/jars/
 
 # Jobs Spark
 COPY jobs/ /opt/spark/jobs/
+WORKDIR /opt/spark/jobs
 
 # Entrypoint
 COPY spark-entrypoint.sh /entrypoint.sh

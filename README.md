@@ -62,8 +62,8 @@ data_lake/
    processed/
 
 processing/
-   spark_jobs/
-      clean_data.py
+   jobs/ #spark
+      streaming_job.py
       transform_data.py
 
 warehouse/
