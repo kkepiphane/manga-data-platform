@@ -6,9 +6,11 @@ USER root
 RUN apt-get update && apt-get install -y openjdk-11-jdk curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Variables Java
+# Variables Java & spark
+ENV SPARK_HOME=/opt/spark
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-ENV PATH=$JAVA_HOME/bin:$PATH
+ENV PATH=$SPARK_HOME/bin:$JAVA_HOME/bin:$PATH
+ENV PYSPARK_SUBMIT_ARGS="--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.2 pyspark-shell"
 
 # JDBC PostgreSQL
 COPY postgresql-42.6.2.jar /opt/spark/jars/
