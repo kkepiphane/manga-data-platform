@@ -44,6 +44,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.3.0
+    container_name: manga_kafka
     depends_on:
       - zookeeper
     ports:

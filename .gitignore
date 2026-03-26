@@ -1,1 +1,2 @@
-ingestion/data
+data_lake/raw
+data_lake/checkpoints
