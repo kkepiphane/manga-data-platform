@@ -32,6 +32,10 @@ spark.jars                       /opt/spark/jars/postgresql-42.6.2.jar
 # Event log
 spark.eventLog.enabled           true
 spark.eventLog.dir               /opt/spark/logs
+
+# monitoring
+spark.metrics.conf.*.sink.prometheusServlet.class=org.apache.spark.metrics.sink.PrometheusServlet
+spark.metrics.conf.*.sink.prometheusServlet.path=/metrics
 EOF
 
 # -----------------------------------------------------------------------------
@@ -50,12 +54,27 @@ mkdir -p /opt/spark/logs
 # -----------------------------------------------------------------------------
 case "${SPARK_ROLE}" in
   master)
-    echo "[Spark] Démarrage en mode MASTER"
-    exec ${SPARK_HOME}/bin/spark-class \
+       echo "[Spark] Démarrage en mode MASTER"
+
+    # 1️⃣ Démarrer le master en arrière-plan
+    ${SPARK_HOME}/bin/spark-class \
       org.apache.spark.deploy.master.Master \
       --host 0.0.0.0 \
       --port 7077 \
-      --webui-port 8080
+      --webui-port 8080 &
+
+    sleep 5
+
+    echo "[Spark] Lancement du job streaming..."
+
+    # 2️⃣ Lancer ton job streaming
+    ${SPARK_HOME}/bin/spark-submit \
+      --master spark://spark-master:7077 \
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.2 \
+      /opt/spark/jobs/streaming_job.py &
+
+    # 3️⃣ Garder le container vivant
+    wait
     ;;
   worker)
     echo "[Spark] Démarrage en mode WORKER"

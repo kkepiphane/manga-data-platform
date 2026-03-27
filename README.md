@@ -291,9 +291,17 @@ Créer une plateforme capable de :
 * recommander les meilleurs mangas aux utilisateurs
 * démontrer une architecture data moderne.
 
-docker exec -it manga_postgres psql -U manga -d manga_db
-docker compose exec scraper scrapy crawl topito
-docker compose exec scraper scrapy crawl senscritique
+---
 
-docker exec -it manga_spark_master bash
-spark-submit   --master spark://spark-master:7077   --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.2   streaming_job.py
+# Goal of monitoring
+* Prometheus → collecte métriques
+* Grafana → dashboards
+* Kafka → metrics Kafka
+* Apache Spark → metrics Spark
+
+* docker exec -it manga_postgres psql -U manga -d manga_db
+* docker compose exec scraper scrapy crawl topito
+* docker compose exec scraper scrapy crawl senscritique
+
+* docker exec -it manga_spark_master bash
+* spark-submit   --master spark://spark-master:7077   --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.2   streaming_job.py
